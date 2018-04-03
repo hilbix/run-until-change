@@ -124,7 +124,7 @@ main(int argc, char **argv)
       return 42;
     }
 
-  pid	= tino_fork_execE(NULL, 0, argv, NULL, 0, NULL);
+  pid	= tino_fork_exec_sidE(NULL, 0, argv, NULL, 0, NULL, 1);
   info("[%ld] exec %s", (long)pid, argv[0]);
   if (pid==(pid_t)-1)
     ex("fork %s", argv[0]);
@@ -152,7 +152,8 @@ main(int argc, char **argv)
 #define	EQ(x)	&& (st.st_##x == p->stat.st_##x)
           if (1 EQ(dev) EQ(ino) EQ(mode) EQ(uid) EQ(gid) EQ(size) EQ(mtime) EQ(ctime))
             continue;
-          if (kill(pid, (sigs<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
+          /* kill the session */
+          if (kill(-pid, (sig<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
             info("[%ld] kill %d failed for %s (changed %s)", (long)pid, sigs[sig], argv[0], p->name);
           else
             info("[%ld] killed %s: changed %s", (long)pid, argv[0], p->name);
