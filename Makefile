@@ -1,11 +1,11 @@
 # Makefile automatically generated, do not edit!
 # This output (only this Makefile) is Public Domain.
 #
-#@MD5TINOIGN@ Creation date: Tue Apr  3 17:12:33 CEST 2018
+#@MD5TINOIGN@ Creation date: Tue Apr  3 18:35:12 CEST 2018
 #
 # This file is based on following files:
 #@MD5TINOIGN@ 1: Makefile.tino
-#@MD5TINOIGN@ 2: /home/tino/src/run-until-changed/tino/Makefile.proto
+#@MD5TINOIGN@ 2: tino/Makefile.proto
 
 #
 #@MD5TINOIGN@ included: Makefile.tino
@@ -32,8 +32,10 @@ ADD_LDFLAGS=
   DISTCLEAN=
    TINOCOPY=
 
+INSTALLPATH=/usr/local
+
 #
-#@MD5TINOIGN@ included: /home/tino/src/run-until-changed/tino/Makefile.proto
+#@MD5TINOIGN@ included: tino/Makefile.proto
 #
 
 # Automatically generated from "PROGS" above
@@ -44,7 +46,6 @@ ADD_LDFLAGS=
  STD_CCFLAGS=-g -Wall -Wno-unused-function -O3 -Wno-error=unused-value -Wno-error=unused-function
 STD_LDFLAGS=
  STD_LDLIBS=
-INSTALLPATH=$(HOME)
     BINPATH=bin
    SBINPATH=sbin
     LIBPATH=lib
