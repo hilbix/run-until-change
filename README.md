@@ -2,8 +2,13 @@
 
 - Runs a command or script
 - If the program terminates, return the normal status code
-- If one of the given files change, kill the program
+- If one of the given files change, kill the program (see list of signals below)
 - If no file is given, use the command or script name is checked
+- For proper signal processing, the child is run under `setsid()`
+  - Signals sent to `run-until-change` are forwarded to the complete session
+  - This way, Ctrl+C works as expected.
+- You can give a list of signals on the commandline.  These are sent with 1s delay.
+- The default is to SIGTERM then SIGKILL.  (SIGKILL is always the last signal)
 
 Currently, the checks are purely `stat()` based:
 
@@ -21,12 +26,13 @@ Future thoughts:
 
 	git clone https://github.com/hilbix/run-until-change.git
 	cd run-until-change
+	git submodule update --init
 	make
 	sudo make install
 
 Then:
 
-	run-until-change files_to_check.. -- command_or_script [args..]
+	run-until-change [-signal..] files_to_check.. -- command_or_script [args..]
 
 
 ## Example
