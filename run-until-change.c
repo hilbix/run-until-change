@@ -15,7 +15,8 @@ static int		tock;
 
 #define	MAXFILES	2000
 
-struct statcheck
+static int sigs[100];
+static struct statcheck
   {
     struct stat	stat;
     const char	*name;
@@ -84,21 +85,38 @@ statcheck_add(int nr, const char *name)
     ex("cannot stat: %s", name);
 }
 
+static void
+sig_add(int sig)
+{
+  static int nr;
+
+  if (sigs[nr])
+    nr++;
+  if (nr>=(sizeof sigs/sizeof *sigs)-1)
+    ex("too many signal definitions: %d", nr);
+  sigs[nr]	= sig;
+}
+
 int
 main(int argc, char **argv)
 {
   pid_t		pid, tmp;
   int		status, result;
   const char	*s;
-  int		nr;
+  int		nr, sig;
 
   setarg0(argv[0]);
 
   for (nr=0; --argc>0 && strcmp(*++argv, "--"); )
-    statcheck_add(nr++, argv[0]);
+    if (argv[0][0]=='-')
+      sig_add(atoi(argv[0]+1));
+    else
+      statcheck_add(nr++, argv[0]);
   argv++;
   if (!nr)
     statcheck_add(nr++, argv[0]);
+  if (!sigs[0])
+    sigs[0]=15;
 
   if (argc<1)
     {
@@ -111,6 +129,7 @@ main(int argc, char **argv)
   if (pid==(pid_t)-1)
     ex("fork %s", argv[0]);
 
+  sig = 0;
   tino_alarm_set(1, tick, NULL);
 
   while ((tmp=waitpid((pid_t)-1, &status, 0))!=pid)
@@ -133,17 +152,18 @@ main(int argc, char **argv)
 #define	EQ(x)	&& (st.st_##x == p->stat.st_##x)
           if (1 EQ(dev) EQ(ino) EQ(mode) EQ(uid) EQ(gid) EQ(size) EQ(mtime) EQ(ctime))
             continue;
-          if (kill(pid, 9))
-            info("[%ld] kill failed for %s (changed %s)", pid, argv[0], p->name);
+          if (kill(pid, (sigs<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
+            info("[%ld] kill %d failed for %s (changed %s)", (long)pid, sigs[sig], argv[0], p->name);
           else
-            info("[%ld] killed %s: changed %s", pid, argv[0], p->name);
+            info("[%ld] killed %s: changed %s", (long)pid, argv[0], p->name);
+          sig++;
           break;
         }
     }
 
   TINO_ALARM_RUN();
   s	= tino_wait_child_status_string(status, &result);
-  info("[%ld] result %s: %s", pid, argv[0], s);
+  info("[%ld] result %s: %s", (long)pid, argv[0], s);
 
   return status;
 }
