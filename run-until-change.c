@@ -12,6 +12,7 @@
 static long		mypid;
 static const char	*arg0;
 static int		tock;
+static pid_t		child;
 
 #define	MAXFILES	2000
 
@@ -97,10 +98,34 @@ sig_add(int sig)
   sigs[nr]	= sig;
 }
 
+#define	SIG(X,Y)	void X (void) { if (child) kill(-child, Y); TINO_SIGNAL(SIG##X, X); }
+#define	SIG1(X)		SIG(sig_##X,X)
+#define	SIG2(X,Y)	SIG(sig_##X,Y)
+
+SIG1(SIGHUP  )
+SIG1(SIGINT  )
+SIG1(SIGQUIT )
+SIG2(SIGILL  ,SIGTERM)
+SIG2(SIGTRAP ,SIGTERM)
+SIG2(SIGABRT ,SIGTERM)
+SIG2(SIGBUS  ,SIGTERM)
+SIG2(SIGFPE  ,SIGTERM)
+/* SIG1(SIGKILL ) impossible */
+SIG1(SIGUSR1 )
+SIG2(SIGSEGV ,SIGTERM)
+SIG1(SIGUSR2 )
+SIG1(SIGTERM )
+SIG1(SIGCONT )
+/* SIG1(SIGSTOP ) impossible */
+SIG1(SIGTSTP )
+SIG1(SIGURG  )
+SIG1(SIGWINCH)
+SIG1(SIGPWR  )
+
 int
 main(int argc, char **argv)
 {
-  pid_t		pid, tmp;
+  pid_t		tmp;
   int		status, result;
   const char	*s;
   int		nr, sig;
@@ -124,15 +149,35 @@ main(int argc, char **argv)
       return 42;
     }
 
-  pid	= tino_fork_exec_sidE(NULL, 0, argv, NULL, 0, NULL, 1);
-  info("[%ld] exec %s", (long)pid, argv[0]);
-  if (pid==(pid_t)-1)
+#define	PASS(X) TINO_SIGACTION(X, sig_##X); TINO_SIGNAL(X, sig_##X)
+
+  PASS(SIGHUP  );
+  PASS(SIGINT  );
+  PASS(SIGQUIT );
+  PASS(SIGILL  );
+  PASS(SIGTRAP );
+  PASS(SIGABRT );
+  PASS(SIGBUS  );
+  PASS(SIGFPE  );
+  PASS(SIGUSR1 );
+  PASS(SIGSEGV );
+  PASS(SIGUSR2 );
+  PASS(SIGTERM );
+  PASS(SIGCONT );
+  PASS(SIGTSTP );
+  PASS(SIGURG  );
+  PASS(SIGWINCH);
+  PASS(SIGPWR  );
+
+  child	= tino_fork_exec_sidE(NULL, 0, argv, NULL, 0, NULL, 1);
+  info("[%ld] exec %s", (long)child, argv[0]);
+  if (child==(pid_t)-1)
     ex("fork %s", argv[0]);
 
   sig = 0;
   tino_alarm_set(1, tick, NULL);
 
-  while ((tmp=waitpid((pid_t)-1, &status, 0))!=pid)
+  while ((tmp=waitpid((pid_t)-1, &status, 0))!=child)
     {
       struct stat	st;
       int		n;
@@ -153,18 +198,19 @@ main(int argc, char **argv)
           if (1 EQ(dev) EQ(ino) EQ(mode) EQ(uid) EQ(gid) EQ(size) EQ(mtime) EQ(ctime))
             continue;
           /* kill the session */
-          if (kill(-pid, (sig<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
-            info("[%ld] kill %d failed for %s (changed %s)", (long)pid, sigs[sig], argv[0], p->name);
+          if (kill(-child, (sig<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
+            info("[%ld] kill %d failed for %s (changed %s)", (long)child, sigs[sig], argv[0], p->name);
           else
-            info("[%ld] killed %s: changed %s", (long)pid, argv[0], p->name);
+            info("[%ld] killed %s: changed %s", (long)child, argv[0], p->name);
           sig++;
           break;
         }
     }
+  child	= 0;
 
   TINO_ALARM_RUN();
   s	= tino_wait_child_status_string(status, &result);
-  info("[%ld] result %s: %s", (long)pid, argv[0], s);
+  info("[%ld] result %s: %s", (long)tmp, argv[0], s);
 
   return status;
 }
