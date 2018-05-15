@@ -9,6 +9,8 @@
 #include "tino/alarm.h"
 #include "tino/proc.h"
 
+#include "run-until-change_version.h"
+
 static long		mypid;
 static const char	*arg0;
 static int		tock;
@@ -141,6 +143,7 @@ main(int argc, char **argv)
   if (argc<2)
     {
       fprintf(stderr, "Usage: %s [-signal..] files_to_check.. -- program [args..]\n", arg0);
+      fprintf(stderr, "\t\tVersion " RUN_UNTIL_CHANGE_VERSION " compiled " __DATE__ "\n");
       fprintf(stderr, "\tfiles_to_check defaults to 'program' if none given.\n");
       fprintf(stderr, "\t'program' is terminated by sending signals to it each second.\n");
       fprintf(stderr, "\tdefault 15 or given list, followed by 9 if list is exhausted.\n");

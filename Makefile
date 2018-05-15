@@ -1,7 +1,7 @@
 # Makefile automatically generated, do not edit!
 # This output (only this Makefile) is Public Domain.
 #
-#@MD5TINOIGN@ Creation date: Tue Apr  3 18:35:12 CEST 2018
+#@MD5TINOIGN@ Creation date: Tue May 15 16:32:33 CEST 2018
 #
 # This file is based on following files:
 #@MD5TINOIGN@ 1: Makefile.tino
@@ -173,7 +173,7 @@ $(PROG1).o:  run-until-change.c tino/alarm.h tino/file.h \
  tino/sysfix.h tino/sysfix_cygwin.h tino/sysfix_diet.h \
  tino/sysfix_linux.h tino/sysfix_osx.h tino/type.h tino/fatal.h tino/ex.h \
  tino/arg.h tino/alloc.h tino/err.h tino/debug.h tino/signals.h \
- tino/proc.h tino/strprintf.h tino/str.h
+ tino/proc.h tino/strprintf.h tino/str.h run-until-change_version.h
 
 
 #@MD5TINOIGN@ rules from: Makefile.tino
