@@ -145,7 +145,10 @@ main(int argc, char **argv)
 
   if (argc<1)
     {
-      fprintf(stderr, "Usage: %s program [args..]\n", arg0);
+      fprintf(stderr, "Usage: %s [-signal..] files_to_check.. -- program [args..]\n", arg0);
+      fprintf(stderr, "\tfiles_to_check defaults to 'program' if none given.\n");
+      fprintf(stderr, "\t'program' is terminated by sending signals to it each second.\n");
+      fprintf(stderr, "\tdefault 15 or given list, followed by 9 if list is exhausted.\n");
       return 42;
     }
 
