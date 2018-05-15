@@ -200,11 +200,12 @@ main(int argc, char **argv)
 #define	EQ(x)	&& (st.st_##x == p->stat.st_##x)
           if (1 EQ(dev) EQ(ino) EQ(mode) EQ(uid) EQ(gid) EQ(size) EQ(mtime) EQ(ctime))
             continue;
+          info("[%ld] changed %s", (long)child, p->name);
           /* kill the session */
           if (kill(-child, (sig<sizeof sigs/sizeof *sigs && sigs[sig]) ? sigs[sig] : 9))
-            info("[%ld] kill %d failed for %s (changed %s)", (long)child, sigs[sig], argv[0], p->name);
+            info("[%ld] failed kill %s: signal %d", (long)child, argv[0], sigs[sig]);
           else
-            info("[%ld] killed %s: changed %s", (long)child, argv[0], p->name);
+            info("[%ld] kill %s: signal %d", (long)child, argv[0], sigs[sig]);
           sig++;
           break;
         }
