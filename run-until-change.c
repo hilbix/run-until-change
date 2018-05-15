@@ -138,12 +138,7 @@ main(int argc, char **argv)
     else
       statcheck_add(nr++, argv[0]);
   argv++;
-  if (!nr)
-    statcheck_add(nr++, argv[0]);
-  if (!sigs[0])
-    sigs[0]=15;
-
-  if (argc<1)
+  if (argc<2)
     {
       fprintf(stderr, "Usage: %s [-signal..] files_to_check.. -- program [args..]\n", arg0);
       fprintf(stderr, "\tfiles_to_check defaults to 'program' if none given.\n");
@@ -151,6 +146,11 @@ main(int argc, char **argv)
       fprintf(stderr, "\tdefault 15 or given list, followed by 9 if list is exhausted.\n");
       return 42;
     }
+
+  if (!nr)
+    statcheck_add(nr++, argv[0]);
+  if (!sigs[0])
+    sigs[0]=15;
 
 #define	PASS(X) TINO_SIGACTION(X, sig_##X); TINO_SIGNAL(X, sig_##X)
 
