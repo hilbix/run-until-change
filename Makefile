@@ -1,7 +1,7 @@
 # Makefile automatically generated, do not edit!
 # This output (only this Makefile) is Public Domain.
 #
-#@MD5TINOIGN@ Creation date: Tue May 15 16:32:33 CEST 2018
+#@MD5TINOIGN@ Creation date: Wed Jul 29 20:23:04 CEST 2020
 #
 # This file is based on following files:
 #@MD5TINOIGN@ 1: Makefile.tino
@@ -73,6 +73,7 @@ VERSIONNAME=$(VERSIONFILE)
 
        GAWK=awk
       TOUCH=touch
+      MKDIR=mkdir
 
          CP=cp
       STRIP=strip
@@ -109,7 +110,7 @@ Makefile:	Makefile.md5
 	$(TOUCH) Makefile
 
 Makefile.md5:	$(VERSIONFILE).$(VERSIONEXT) always
-	@$(GAWK) -vHERE="$(HERE)" -vMAKE="$(MAKE)" -vTINOCOPY="$(TINOCOPY)" 'BEGIN { \
+	@[ -z '$(HERE)' ] || $(GAWK) -vHERE="$(HERE)" -vMAKE="$(MAKE)" -vTINOCOPY="$(TINOCOPY)" 'BEGIN { \
 	if ((getline < "tino/Makefile")>0 && \
 	    (getline < "tino/Makefile.proto")>0 && \
 	    (getline < "tino/Makefile.awk")>-1) \
@@ -129,6 +130,7 @@ $(VERSIONFILE).py:	VERSION
 
 install::
 	$(RM) "$(INSTALLPATH)/bin/$(PROG1)"
+	$(MKDIR) -pm755 "$(INSTALLPATH)/bin"
 	$(CP) "$(PROG1)" "$(INSTALLPATH)/bin/$(PROG1)"
 	$(STRIP) "$(INSTALLPATH)/bin/$(PROG1)"
 
@@ -172,7 +174,7 @@ $(PROG1):	$(PROG1).o $(OBJS) $(LIBS)
 $(PROG1).o:  run-until-change.c tino/alarm.h tino/file.h \
  tino/sysfix.h tino/sysfix_cygwin.h tino/sysfix_diet.h \
  tino/sysfix_linux.h tino/sysfix_osx.h tino/type.h tino/fatal.h tino/ex.h \
- tino/arg.h tino/alloc.h tino/err.h tino/debug.h tino/signals.h \
+ tino/arg.h tino/alloc.h tino/debug.h tino/err.h tino/signals.h \
  tino/proc.h tino/strprintf.h tino/str.h run-until-change_version.h
 
 
